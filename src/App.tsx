@@ -217,6 +217,7 @@ function App() {
             <pre className="code">
               {JSON.stringify(transactionResult, null, 2)}
             </pre>
+            <div>Go to Explorer </div>
             <p>Please check your balance again.</p>
 
 
@@ -224,16 +225,18 @@ function App() {
         ) : (
           <form className="container" onSubmit={login}>
             <h3>Please sign up or login</h3>
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder="Enter your email"
-              onChange={(event) => {
-                setEmail(event.target.value);
-              }}
-            />
-            <button type="submit">Send</button>
+            <div className="row">
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="Enter your email"
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
+              />
+              <button type="submit">Send</button>
+            </div>
           </form>
         )}
       </div>
