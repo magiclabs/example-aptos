@@ -149,10 +149,10 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
         <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={magicLogo} className="logo react" alt="Magic logo" />
+          <img src={magicLogo} className="logo magic" alt="Magic logo" />
         </a>
         <a href="https://react.dev" target="_blank" rel="noreferrer">
-          <img src={aptosLogo} className="logo react" alt="Aptos logo" />
+          <img src={aptosLogo} className="logo aptos" alt="Aptos logo" />
         </a>
       </div>
 
