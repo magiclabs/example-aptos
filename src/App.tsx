@@ -1,7 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Magic } from 'magic-sdk';
 import { AptosExtension } from '@magic-ext/aptos';
-import { AptosClient, HexString, CoinClient, FaucetClient } from 'aptos'
+import { AuthExtension } from '@magic-ext/auth';
+import { AptosClient, CoinClient, FaucetClient } from 'aptos'
 
 import magicLogo from './assets/magic.svg'
 import reactLogo from './assets/react.svg'
@@ -22,6 +23,7 @@ const SAMPLE_RAW_TRANSACTION = {
 const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
   endpoint: import.meta.env.VITE_MAGIC_ENDPOINT,
   extensions: [
+    new AuthExtension(),
     new AptosExtension({
       nodeUrl: DEVNET_NODE_URL
     }),
@@ -36,16 +38,20 @@ function App() {
   const [balance, setBalance] = useState(BigInt(0));
 
   const [walletAddress, setWalletAddress] = useState('')
-  const [rawTransaction, setRawTransaction] = useState<any>()
-  const [signedTransaction, setSignedTransaction] = useState('')
-  const [transactionResult, setTransactionResult] = useState<any>('')
+  const [rawTransaction, setRawTransaction] = useState<any>(null)
+  const [signedTransaction, setSignedTransaction] = useState<Uint8Array | string | null>(null)
+  const [transactionResult, setTransactionResult] = useState<any>(null)
 
   useEffect(() => {
     magic.user.isLoggedIn().then((async (magicIsLoggedIn: boolean) => {
       setIsLoggedIn(magicIsLoggedIn)
       if (magicIsLoggedIn) {
         setUserMetadata(await magic.user.getInfo());
-        setWalletAddress(await magic.aptos.getAccount());
+
+        const address = await magic.aptos.getAccount();
+        setWalletAddress(address);
+
+        getBalance(address)
       }
     }))
   }, [isLoggedIn])
@@ -97,18 +103,20 @@ function App() {
   }
 
   const signTransaction = async () => {
-    /* sign the transaction */
-    const hexAddress = new HexString(walletAddress)
+    if (!walletAddress) {
+      console.warn('No account')
+      return
+    }
 
-    const client = new AptosClient(DEVNET_NODE_URL);
-    const rawTransaction = await client.generateTransaction(hexAddress, SAMPLE_RAW_TRANSACTION)
+    /* sign the transaction */
+    if (!rawTransaction) {
+      setSignedTransaction('No raw transaction')
+      console.warn('No raw transaction')
+      return
+    }
 
     const signedTransaction = await magic.aptos.signTransaction(rawTransaction)
     setSignedTransaction(signedTransaction)
-
-    /* submit the transaction */
-    const txHash = await client.submitTransaction(signedTransaction)
-    console.log(txHash.hash);
   }
 
   const sendTransaction = async () => {
@@ -120,15 +128,14 @@ function App() {
     setTransactionResult(null)
 
     /* send the transaction */
-    const hexAddress = new HexString(walletAddress)
+    if (!signedTransaction || typeof signedTransaction === 'string') {
+      setTransactionResult('No signed transaction')
+      console.warn('No signed transaction')
+      return
+    }
 
     const client = new AptosClient(DEVNET_NODE_URL);
-    const rawTransaction = await client.generateTransaction(hexAddress, SAMPLE_RAW_TRANSACTION)
-    const signedTransaction = await magic.aptos.signTransaction(rawTransaction)
-    console.log(signedTransaction)
-
     const transaction = await client.submitTransaction(signedTransaction)
-    console.log(transaction)
     setTransactionResult(transaction)
 
     // wait for the transaction to be confirmed
@@ -190,6 +197,7 @@ function App() {
 
             <h2>Transaction</h2>
             <p>Let's send a transaction to Jay.</p>
+            <p className="notice">Notice. Before you start, please get some coins with the above faucet.</p>
 
             <h3>Generate transaction</h3>
             <p>This is sample data that sends 1,000 coins to Jay.</p>
@@ -208,7 +216,7 @@ function App() {
             <p>Before sending the transaction, let's sign the transaction first.</p>
             <button onClick={signTransaction}>Sign the transaction</button>
             <pre className="code">
-              {signedTransaction}
+              {JSON.stringify(signedTransaction)}
             </pre>
 
             <h3>Send Transaction</h3>
@@ -217,7 +225,14 @@ function App() {
             <pre className="code">
               {JSON.stringify(transactionResult, null, 2)}
             </pre>
-            <div>Go to Explorer </div>
+            {transactionResult && transactionResult.success && (
+              <a
+                href={`https://explorer.aptoslabs.com/txn/${transactionResult.version}?network=testnet`}
+                target="_blank"
+                rel="noreferrer">
+                Go to Explorer
+              </a>
+            )}
             <p>Please check your balance again.</p>
 
 

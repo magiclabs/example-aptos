@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@magic-ext/aptos": "^0.2.1",
+    "@magic-ext/auth": "^0.2.4",
     "aptos": "^1.9.0",
     "magic-sdk": "^17.1.5",
     "react": "^18.2.0",
