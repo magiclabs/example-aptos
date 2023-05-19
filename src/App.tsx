@@ -9,8 +9,8 @@ import aptosLogo from './assets/aptos.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
-const DEVNET_NODE_URL = 'https://fullnode.devnet.aptoslabs.com';
-const DEVNET_FAUCET_URL = 'https://faucet.devnet.aptoslabs.com';
+const DEVNET_NODE_URL = 'https://fullnode.testnet.aptoslabs.com';
+const DEVNET_FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
 
 const JAY_WALLET_ADDRESS = '0x906fd65afe31b7237cd4d7c4073d8bf76c61b6a24ec64dd26f0c16de5c2444d5'
 const SAMPLE_RAW_TRANSACTION = {
