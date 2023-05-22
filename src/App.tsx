@@ -13,15 +13,14 @@ import './App.css'
 const DEVNET_NODE_URL = 'https://fullnode.testnet.aptoslabs.com';
 const DEVNET_FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
 
-const JAY_WALLET_ADDRESS = '0x906fd65afe31b7237cd4d7c4073d8bf76c61b6a24ec64dd26f0c16de5c2444d5'
+const MAGIC_WALLET_ADDRESS = '0x906fd65afe31b7237cd4d7c4073d8bf76c61b6a24ec64dd26f0c16de5c2444d5'
 const SAMPLE_RAW_TRANSACTION = {
   function: "0x1::coin::transfer",
   type_arguments: ["0x1::aptos_coin::AptosCoin"],
-  arguments: [JAY_WALLET_ADDRESS, 1000]
+  arguments: [MAGIC_WALLET_ADDRESS, 1000]
 }
 
 const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
-  endpoint: import.meta.env.VITE_MAGIC_ENDPOINT,
   extensions: [
     new AuthExtension(),
     new AptosExtension({
@@ -47,8 +46,9 @@ function App() {
       setIsLoggedIn(magicIsLoggedIn)
       if (magicIsLoggedIn) {
         setUserMetadata(await magic.user.getInfo());
-
+        console.log('here!')
         const address = await magic.aptos.getAccount();
+        console.log(address)
         setWalletAddress(address);
 
         getBalance(address)
@@ -187,20 +187,20 @@ function App() {
               {walletAddress}
             </pre>
 
+            <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵</button>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2>Balacne: {balance?.toString() ?? '0'} coins</h2>
+              <h2>Balance: {balance?.toString() ?? '0'} coins</h2>
               <button onClick={() => getBalance(walletAddress)}>Get Balance</button>
             </div>
-            <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Faucet Get 100,000,000 coins 💵💵💵</button>
 
             <div className="divider" />
 
             <h2>Transaction</h2>
-            <p>Let's send a transaction to Jay.</p>
+            <p>Let's send a transaction to Magic.</p>
             <p className="notice">Notice. Before you start, please get some coins with the above faucet.</p>
 
             <h3>Generate transaction</h3>
-            <p>This is sample data that sends 1,000 coins to Jay.</p>
+            <p>This is sample data that sends 1,000 coins to Magic.</p>
             <pre className='code'>
               {JSON.stringify(SAMPLE_RAW_TRANSACTION, null, 2)}
             </pre>
@@ -220,7 +220,7 @@ function App() {
             </pre>
 
             <h3>Send Transaction</h3>
-            <p>Finally, we can send the transaction! You can see a boring result.</p>
+            <p>Finally, we can send the transaction! You can see the result below.</p>
             <button onClick={sendTransaction}>Send the transaction</button>
             <pre className="code">
               {JSON.stringify(transactionResult, null, 2)}
