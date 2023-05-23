@@ -46,9 +46,7 @@ function App() {
       setIsLoggedIn(magicIsLoggedIn)
       if (magicIsLoggedIn) {
         setUserMetadata(await magic.user.getInfo());
-        console.log('here!')
         const address = await magic.aptos.getAccount();
-        console.log(address)
         setWalletAddress(address);
 
         getBalance(address)
@@ -82,7 +80,7 @@ function App() {
 
   const getBalance = async (address: string) => {
     const client = new AptosClient(DEVNET_NODE_URL);
-    const coinClient = new CoinClient(client); // <:!:section_1a
+    const coinClient = new CoinClient(client);
 
     const balance = await coinClient.checkBalance(address)
     setBalance(balance)
@@ -93,7 +91,6 @@ function App() {
       console.warn('No account')
       return
     }
-    console.log(walletAddress)
 
     /* sign the transaction */
     const client = new AptosClient(DEVNET_NODE_URL);
