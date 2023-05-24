@@ -505,10 +505,9 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@magic-ext/aptos@^0.2.1":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@magic-ext/aptos/-/aptos-0.2.2.tgz#f4937d299e880d8aef7fc264371e68e954283c95"
-  integrity sha512-YIWOKDChtUz/ZlFH2lRc7RNTxwnFmSnCa+/7+pYKByTnjlZA+BOLlBl80G6mtJBPcHc1gSGc90bDeDbuVgp9ZQ==
+"@magic-ext/aptos@./packs/package2.11.tgz":
+  version "0.2.11"
+  resolved "./packs/package2.11.tgz#d4ae5d3e58d4a5a4779e50df0972cad9a46372ef"
 
 "@magic-ext/auth@^0.2.4":
   version "0.2.5"

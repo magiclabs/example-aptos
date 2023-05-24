@@ -1,33 +1,20 @@
 import { useState, useEffect, FormEvent } from 'react'
-import { Magic } from 'magic-sdk';
-import { AptosExtension } from '@magic-ext/aptos';
-import { AuthExtension } from '@magic-ext/auth';
 import { AptosClient, CoinClient, FaucetClient } from 'aptos'
 
+import { magic } from './lib/magic'
+import { DEVNET_FAUCET_URL, DEVNET_NODE_URL, MAGIC_WALLET_ADDRESS } from './constants'
 import magicLogo from './assets/magic.svg'
 import reactLogo from './assets/react.svg'
 import aptosLogo from './assets/aptos.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { CoinClientPlugin } from './components/CoinClientPlugin'
 
-const DEVNET_NODE_URL = 'https://fullnode.testnet.aptoslabs.com';
-const DEVNET_FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
-
-const MAGIC_WALLET_ADDRESS = '0x906fd65afe31b7237cd4d7c4073d8bf76c61b6a24ec64dd26f0c16de5c2444d5'
 const SAMPLE_RAW_TRANSACTION = {
   function: "0x1::coin::transfer",
   type_arguments: ["0x1::aptos_coin::AptosCoin"],
   arguments: [MAGIC_WALLET_ADDRESS, 1000]
 }
-
-const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
-  extensions: [
-    new AuthExtension(),
-    new AptosExtension({
-      nodeUrl: DEVNET_NODE_URL
-    }),
-  ]
-});
 
 function App() {
   const [email, setEmail] = useState('')
@@ -165,7 +152,6 @@ function App() {
       <div className="container">
         <h2>Environment</h2>
         <pre className="code">
-          Network: devnet<br />
           NODE_URL: {DEVNET_NODE_URL}<br />
           FAUCET_URL: {DEVNET_FAUCET_URL}
         </pre>
@@ -232,7 +218,7 @@ function App() {
             )}
             <p>Please check your balance again.</p>
 
-
+            <CoinClientPlugin />
           </div>
         ) : (
           <form className="container" onSubmit={login}>
