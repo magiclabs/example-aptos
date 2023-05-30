@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@magic-ext/aptos": "^0.2.1",
+    "@aptos-labs/wallet-adapter-core": "^2.2.0",
+    "@magic-ext/aptos": "./packs/package_0.18.0.tgz",
     "@magic-ext/auth": "^0.2.4",
+    "@magic-ext/oauth": "^11.3.0",
     "aptos": "^1.9.0",
     "magic-sdk": "^17.1.5",
     "react": "^18.2.0",

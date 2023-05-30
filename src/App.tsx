@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Magic } from 'magic-sdk';
-import { AptosExtension } from '@magic-ext/aptos';
+import { AptosExtension, MagicAptosWallet } from '@magic-ext/aptos';
 import { AuthExtension } from '@magic-ext/auth';
 import { AptosClient, CoinClient, FaucetClient } from 'aptos'
 
@@ -9,6 +9,7 @@ import reactLogo from './assets/react.svg'
 import aptosLogo from './assets/aptos.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { AccountInfo } from '@aptos-labs/wallet-adapter-core';
 
 const DEVNET_NODE_URL = 'https://fullnode.testnet.aptoslabs.com';
 const DEVNET_FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
@@ -21,6 +22,7 @@ const SAMPLE_RAW_TRANSACTION = {
 }
 
 const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
+  endpoint: 'http://localhost:3014/',
   extensions: [
     new AuthExtension(),
     new AptosExtension({
@@ -29,53 +31,69 @@ const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
   ]
 });
 
+const magicAptosWallet = new MagicAptosWallet(magic)
+
 function App() {
   const [email, setEmail] = useState('')
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userMetadata, setUserMetadata] = useState({});
+  const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [balance, setBalance] = useState(BigInt(0));
 
-  const [walletAddress, setWalletAddress] = useState('')
-  const [rawTransaction, setRawTransaction] = useState<any>(null)
-  const [signedTransaction, setSignedTransaction] = useState<Uint8Array | string | null>(null)
-  const [transactionResult, setTransactionResult] = useState<any>(null)
+  const [resultA, setResultA] = useState<any>("")
+  const [resultB, setResultB] = useState<any>("")
 
   useEffect(() => {
     magic.user.isLoggedIn().then((async (magicIsLoggedIn: boolean) => {
       setIsLoggedIn(magicIsLoggedIn)
-      if (magicIsLoggedIn) {
-        setUserMetadata(await magic.user.getInfo());
-        const address = await magic.aptos.getAccount();
-        setWalletAddress(address);
-
-        getBalance(address)
-      }
     }))
   }, [isLoggedIn])
 
-  const login = async (e: FormEvent) => {
+  const connect = async (e: FormEvent) => {
     e.preventDefault();
 
-    await magic.auth.loginWithMagicLink({ email });
+    await magicAptosWallet.connectWithMagicLink({ email });
     setIsLoggedIn(true);
   };
 
-  const logout = async () => {
-    await magic.user.logout();
+  const disconnect = async () => {
+    await magicAptosWallet.disconnect();
     setIsLoggedIn(false);
   }
 
+  const handleAccount = async () => {
+    const accountInfo = await magicAptosWallet.account()
+    setAccountInfo(accountInfo)
+  }
+
+  const handleSignAndSubmitTransaction = async () => {
+    const result = await magicAptosWallet.signAndSubmitTransaction(SAMPLE_RAW_TRANSACTION)
+    setResultA(result)
+  }
+
+  const handleSignMessage = async () => {
+    if (!accountInfo) {
+      console.warn('No account')
+      return
+    }
+  
+    const result = await magicAptosWallet.signMessage({
+      message: 'Hello World',
+      nonce: 2,
+    })
+    setResultB(result)
+  }
+
   const faucetFiveCoins = async () => {
-    if (!walletAddress) {
+    if (!accountInfo) {
       console.warn('No account')
       return
     }
 
     const faucetClient = new FaucetClient(DEVNET_NODE_URL, DEVNET_FAUCET_URL)
-    await faucetClient.fundAccount(walletAddress, 100_000_000)
+    await faucetClient.fundAccount(accountInfo.address, 100_000_000)
 
-    await getBalance(walletAddress)
+    await getBalance(accountInfo.address)
   }
 
   const getBalance = async (address: string) => {
@@ -84,63 +102,6 @@ function App() {
 
     const balance = await coinClient.checkBalance(address)
     setBalance(balance)
-  }
-
-  const generateTransaction = async () => {
-    if (!walletAddress) {
-      console.warn('No account')
-      return
-    }
-
-    /* sign the transaction */
-    const client = new AptosClient(DEVNET_NODE_URL);
-
-    const rawTransaction = await client.generateTransaction(walletAddress, SAMPLE_RAW_TRANSACTION)
-    setRawTransaction(rawTransaction)
-  }
-
-  const signTransaction = async () => {
-    if (!walletAddress) {
-      console.warn('No account')
-      return
-    }
-
-    /* sign the transaction */
-    if (!rawTransaction) {
-      setSignedTransaction('No raw transaction')
-      console.warn('No raw transaction')
-      return
-    }
-
-    const signedTransaction = await magic.aptos.signTransaction(rawTransaction)
-    setSignedTransaction(signedTransaction)
-  }
-
-  const sendTransaction = async () => {
-    if (!walletAddress) {
-      console.warn('No account')
-      return
-    }
-
-    setTransactionResult(null)
-
-    /* send the transaction */
-    if (!signedTransaction || typeof signedTransaction === 'string') {
-      setTransactionResult('No signed transaction')
-      console.warn('No signed transaction')
-      return
-    }
-
-    const client = new AptosClient(DEVNET_NODE_URL);
-    const transaction = await client.submitTransaction(signedTransaction)
-    setTransactionResult(transaction)
-
-    // wait for the transaction to be confirmed
-    const result = await client.waitForTransactionWithResult(transaction.hash, {
-      checkSuccess: true
-    })
-
-    setTransactionResult(result)
   }
 
   return (
@@ -173,69 +134,41 @@ function App() {
 
       <div className="card">
         {isLoggedIn ? (
-          <div style={{ width: '700px', overflow: 'hidden', textAlign: 'start' }}>
-            <button onClick={logout}>Logout</button>
-
-            <h3>User Metadata</h3>
-            <pre className="code">{JSON.stringify(userMetadata, null, 2)}</pre>
-
-            <h3>Your wallet address is</h3>
-            <pre className="code">
-              {walletAddress}
-            </pre>
+          <>
+          <button onClick={disconnect}>Disconnect</button>
+          <div style={{ width: '700px', overflow: 'hidden', textAlign: 'start' }}> 
+            <h3>account info</h3>
+            <button onClick={handleAccount}>account</button>
+            <pre className="code">{JSON.stringify(accountInfo, null, 2)}</pre>
 
             <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵</button>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <h2>Balance: {balance?.toString() ?? '0'} coins</h2>
-              <button onClick={() => getBalance(walletAddress)}>Get Balance</button>
+              {accountInfo && <button onClick={() => getBalance(accountInfo.address)}>Get Balance</button>}
             </div>
 
             <div className="divider" />
 
             <h2>Transaction</h2>
-            <p>Let's send a transaction to Magic.</p>
+            <p>Let's send a transaction with MagicAptosWallet.</p>
             <p className="notice">Notice. Before you start, please get some coins with the above faucet.</p>
 
-            <h3>Generate transaction</h3>
             <p>This is sample data that sends 1,000 coins to Magic.</p>
             <pre className='code'>
               {JSON.stringify(SAMPLE_RAW_TRANSACTION, null, 2)}
             </pre>
-            <p>You can generate a transaction with generateTransaction method of aptos SDK.</p>
-            <button onClick={generateTransaction}>
-              Generate a transaction with sample data
-            </button>
-            <pre className="code">
-              {JSON.stringify(rawTransaction, (_, value) => typeof value === 'bigint' ? value.toString() : value)}
+            <button onClick={handleSignAndSubmitTransaction}>signAndSubmitTransaction</button>
+            <pre className='code'>
+              {JSON.stringify(resultA, null, 2)}
             </pre>
-
-            <h3>Sign Transaction</h3>
-            <p>Before sending the transaction, let's sign the transaction first.</p>
-            <button onClick={signTransaction}>Sign the transaction</button>
-            <pre className="code">
-              {JSON.stringify(signedTransaction)}
+            <button onClick={handleSignMessage}>signMessage</button>
+            <pre className='code'>
+              {JSON.stringify(resultB, null, 2)}
             </pre>
-
-            <h3>Send Transaction</h3>
-            <p>Finally, we can send the transaction! You can see the result below.</p>
-            <button onClick={sendTransaction}>Send the transaction</button>
-            <pre className="code">
-              {JSON.stringify(transactionResult, null, 2)}
-            </pre>
-            {transactionResult && transactionResult.success && (
-              <a
-                href={`https://explorer.aptoslabs.com/txn/${transactionResult.version}?network=testnet`}
-                target="_blank"
-                rel="noreferrer">
-                Go to Explorer
-              </a>
-            )}
-            <p>Please check your balance again.</p>
-
-
           </div>
+          </>
         ) : (
-          <form className="container" onSubmit={login}>
+          <form className="container" onSubmit={connect}>
             <h3>Please sign up or login</h3>
             <div className="row">
               <input
@@ -247,7 +180,7 @@ function App() {
                   setEmail(event.target.value);
                 }}
               />
-              <button type="submit">Send</button>
+              <button type="submit">Connect</button>
             </div>
           </form>
         )}
