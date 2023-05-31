@@ -31,11 +31,11 @@ const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
   ]
 });
 
-const magicAptosWallet = new MagicAptosWallet(magic)
+const magicAptosWallet = new MagicAptosWallet(magic, {
+  loginWith: 'magicLink',
+})
 
 function App() {
-  const [email, setEmail] = useState('')
-
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [balance, setBalance] = useState(BigInt(0));
@@ -46,24 +46,24 @@ function App() {
   useEffect(() => {
     magic.user.isLoggedIn().then((async (magicIsLoggedIn: boolean) => {
       setIsLoggedIn(magicIsLoggedIn)
+      if (magicIsLoggedIn) {
+        const accountInfo = await magicAptosWallet.account()
+        setAccountInfo(accountInfo)
+        getBalance(accountInfo.address)
+      }
     }))
   }, [isLoggedIn])
 
-  const connect = async (e: FormEvent) => {
+  const handleConnect = async (e: FormEvent) => {
     e.preventDefault();
 
-    await magicAptosWallet.connectWithMagicLink({ email });
+    await magicAptosWallet.connect();
     setIsLoggedIn(true);
   };
 
-  const disconnect = async () => {
+  const handleDisconnect = async () => {
     await magicAptosWallet.disconnect();
     setIsLoggedIn(false);
-  }
-
-  const handleAccount = async () => {
-    const accountInfo = await magicAptosWallet.account()
-    setAccountInfo(accountInfo)
   }
 
   const handleSignAndSubmitTransaction = async () => {
@@ -135,17 +135,16 @@ function App() {
       <div className="card">
         {isLoggedIn ? (
           <>
-          <button onClick={disconnect}>Disconnect</button>
+          <button onClick={handleDisconnect}>Disconnect</button>
           <div style={{ width: '700px', overflow: 'hidden', textAlign: 'start' }}> 
-            <h3>account info</h3>
-            <button onClick={handleAccount}>account</button>
+            <h2>Account Info</h2>
             <pre className="code">{JSON.stringify(accountInfo, null, 2)}</pre>
 
-            <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵</button>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2>Balance: {balance?.toString() ?? '0'} coins</h2>
+              <h3>Balance: {balance?.toString() ?? '0'} coins</h3>
               {accountInfo && <button onClick={() => getBalance(accountInfo.address)}>Get Balance</button>}
             </div>
+            <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵</button>
 
             <div className="divider" />
 
@@ -168,18 +167,9 @@ function App() {
           </div>
           </>
         ) : (
-          <form className="container" onSubmit={connect}>
+          <form className="container" onSubmit={handleConnect}>
             <h3>Please sign up or login</h3>
             <div className="row">
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="Enter your email"
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                }}
-              />
               <button type="submit">Connect</button>
             </div>
           </form>
