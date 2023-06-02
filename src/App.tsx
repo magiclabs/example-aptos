@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { Magic } from 'magic-sdk';
-import { AptosExtension } from '@magic-ext/aptos';
+import { AptosExtension, MagicAptosWallet } from '@magic-ext/aptos';
 import { AuthExtension } from '@magic-ext/auth';
 import { AptosClient, CoinClient, FaucetClient } from 'aptos'
 
@@ -9,6 +9,7 @@ import reactLogo from './assets/react.svg'
 import aptosLogo from './assets/aptos.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { AccountInfo } from '@aptos-labs/wallet-adapter-core';
 
 const DEVNET_NODE_URL = 'https://fullnode.testnet.aptoslabs.com';
 const DEVNET_FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
@@ -21,6 +22,7 @@ const SAMPLE_RAW_TRANSACTION = {
 }
 
 const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
+  endpoint: "http://localhost:3014",
   extensions: [
     new AuthExtension(),
     new AptosExtension({
@@ -30,10 +32,11 @@ const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
 });
 
 function App() {
+  const [aptosWallet, setAptosWallet] = useState<MagicAptosWallet | null>(null);
   const [email, setEmail] = useState('')
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userMetadata, setUserMetadata] = useState({});
+  const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [balance, setBalance] = useState(BigInt(0));
 
   const [walletAddress, setWalletAddress] = useState('')
@@ -45,11 +48,9 @@ function App() {
     magic.user.isLoggedIn().then((async (magicIsLoggedIn: boolean) => {
       setIsLoggedIn(magicIsLoggedIn)
       if (magicIsLoggedIn) {
-        setUserMetadata(await magic.user.getInfo());
-        const address = await magic.aptos.getAccount();
-        setWalletAddress(address);
-
-        getBalance(address)
+        const accountInfo = await magic.aptos.getAccountInfo();
+        setAccountInfo(accountInfo);
+        getBalance(accountInfo.address)
       }
     }))
   }, [isLoggedIn])
@@ -57,7 +58,17 @@ function App() {
   const login = async (e: FormEvent) => {
     e.preventDefault();
 
-    await magic.auth.loginWithMagicLink({ email });
+    const magicAptosWallet = new MagicAptosWallet(magic, {
+      connect: async () => {
+        await magic.auth.loginWithMagicLink({ email });
+        const accountInfo = await magic.aptos.getAccountInfo();
+        return accountInfo;
+      }
+    })
+
+    const accountInfo = await magicAptosWallet.connect();
+    setAccountInfo(accountInfo);
+    setAptosWallet(magicAptosWallet);
     setIsLoggedIn(true);
   };
 
@@ -176,13 +187,8 @@ function App() {
           <div style={{ width: '700px', overflow: 'hidden', textAlign: 'start' }}>
             <button onClick={logout}>Logout</button>
 
-            <h3>User Metadata</h3>
-            <pre className="code">{JSON.stringify(userMetadata, null, 2)}</pre>
-
-            <h3>Your wallet address is</h3>
-            <pre className="code">
-              {walletAddress}
-            </pre>
+            <h3>Account Info</h3>
+            <pre className="code">{JSON.stringify(accountInfo, null, 2)}</pre>
 
             <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵</button>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
