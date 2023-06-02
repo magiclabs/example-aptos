@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent } from 'react'
 import { Magic } from 'magic-sdk';
 import { AptosExtension, MagicAptosWallet } from '@magic-ext/aptos';
 import { AuthExtension } from '@magic-ext/auth';
-import { AptosClient, CoinClient, FaucetClient } from 'aptos'
+import { AptosClient, BCS, CoinClient, FaucetClient, TxnBuilderTypes } from 'aptos'
 
 import magicLogo from './assets/magic.svg'
 import reactLogo from './assets/react.svg'
@@ -47,7 +47,6 @@ function App() {
       if (magicIsLoggedIn) {
         const magicAptosWallet = new MagicAptosWallet(magic, {
           // You don't need to set connect if you're already logged in
-          connect: () => { },
         });
         setAptosWallet(magicAptosWallet)
 
@@ -100,13 +99,81 @@ function App() {
     setBalance(balance)
   }
 
-  const signTransaction = async () => {
+  const handleSignTransaction = async () => {
+    if (!accountInfo || !aptosWallet) {
+      console.warn('No account')
+      return
+    }
+
+    const result = await aptosWallet.signTransaction(SAMPLE_RAW_TRANSACTION)
+    setResult(result);
+  }
+
+  const handleSignAndSubmitTransaction = async () => {
     if (!accountInfo || !aptosWallet) {
       console.warn('No account')
       return
     }
 
     const result = await aptosWallet.signAndSubmitTransaction(SAMPLE_RAW_TRANSACTION)
+    setResult(result);
+  }
+
+  const handleSignAndSubmitBCSTransaction = async () => {
+    if (!accountInfo || !aptosWallet) {
+      console.warn('No account')
+      return
+    }
+
+    const token = new TxnBuilderTypes.TypeTagStruct(
+      TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
+    );
+
+    const payload = new TxnBuilderTypes.TransactionPayloadEntryFunction(
+      TxnBuilderTypes.EntryFunction.natural(
+        "0x1::coin",
+        "transfer",
+        [token],
+        [
+          BCS.bcsToBytes(
+            TxnBuilderTypes.AccountAddress.fromHex(MAGIC_WALLET_ADDRESS)
+          ),
+          BCS.bcsSerializeUint64(1000),
+        ]
+      )
+    );
+
+    const result = await aptosWallet.signAndSubmitBCSTransaction(payload)
+    setResult(result);
+  }
+
+  const handleSignMessage = async () => {
+    if (!accountInfo || !aptosWallet) {
+      console.warn('No account')
+      return
+    }
+
+    const payload = {
+      message: "Hello from Aptos Wallet Adapter",
+      nonce: "random_string",
+    };
+
+    const result = await aptosWallet.signMessage(payload)
+    setResult(result);
+  }
+
+  const handleSignMessageVerify = async () => {
+    if (!accountInfo || !aptosWallet) {
+      console.warn('No account')
+      return
+    }
+
+    const payload = {
+      message: "Hello from Aptos Wallet Adapter",
+      nonce: "random_string",
+    };
+
+    const result = await aptosWallet.signMessageAndVerify(payload)
     setResult(result);
   }
 
@@ -143,27 +210,31 @@ function App() {
           <div style={{ width: '700px', overflow: 'hidden', textAlign: 'start' }}>
             <button onClick={logout}>Logout</button>
 
-            <h3>Account Info</h3>
+            <h2>Account Info</h2>
             <pre className="code">{JSON.stringify(accountInfo, null, 2)}</pre>
 
-            <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵</button>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2>Balance: {balance?.toString() ?? '0'} coins</h2>
+              <h3>Balance: {balance?.toString() ?? '0'} coins</h3>
               {accountInfo && <button onClick={() => getBalance(accountInfo?.address)}>Get Balance</button>}
             </div>
+            <button style={{ width: '100%' }} onClick={faucetFiveCoins}>💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵</button>
 
             <div className="divider" />
 
             <h2>Transaction</h2>
-            <p>Let's send a transaction to Magic.</p>
             <p className="notice">Notice. Before you start, please get some coins with the above faucet.</p>
 
-            <h3>Generate transaction</h3>
-            <p>This is sample data that sends 1,000 coins to Magic.</p>
+            <p>This example transaction sends 1,000 coins to MAGIC.</p>
             <pre className='code'>
               {JSON.stringify(SAMPLE_RAW_TRANSACTION, null, 2)}
             </pre>
-            <button onClick={signTransaction}>signTransaction</button>
+            <div className="button-list">
+              <button onClick={handleSignTransaction}>signTransaction</button>
+              <button onClick={handleSignAndSubmitTransaction}>signAndSubmitTransaction</button>
+              <button onClick={handleSignAndSubmitBCSTransaction}>signAndSubmitBCSTransaction</button>
+              <button onClick={handleSignMessage}>signMessage</button>
+              <button onClick={handleSignMessageVerify}>signMessageVerify</button>
+            </div>
             <pre className="code">
               {JSON.stringify(result, null, 2)}
             </pre>
