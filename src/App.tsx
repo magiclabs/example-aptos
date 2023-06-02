@@ -22,7 +22,6 @@ const SAMPLE_RAW_TRANSACTION = {
 }
 
 const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
-  endpoint: "http://localhost:3014",
   extensions: [
     new AuthExtension(),
     new AptosExtension({
