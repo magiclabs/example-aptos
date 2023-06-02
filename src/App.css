@@ -99,3 +99,12 @@
   border-radius: 0.5em;
   font-weight: bold;
 }
+
+.button-list {
+  flex-wrap: wrap;
+}
+
+.button-list button:not(:first-child) {
+  margin-left: 1em;
+  margin-bottom: 0.5em;
+}
