@@ -161,7 +161,7 @@ function App() {
     setResult(result);
   }
 
-  const handleSignMessageVerify = async () => {
+  const handleSignMessageAndVerify = async () => {
     if (!accountInfo || !aptosWallet) {
       console.warn('No account')
       return
@@ -232,7 +232,7 @@ function App() {
               <button onClick={handleSignAndSubmitTransaction}>signAndSubmitTransaction</button>
               <button onClick={handleSignAndSubmitBCSTransaction}>signAndSubmitBCSTransaction</button>
               <button onClick={handleSignMessage}>signMessage</button>
-              <button onClick={handleSignMessageVerify}>signMessageVerify</button>
+              <button onClick={handleSignMessageAndVerify}>signMessageAndVerify</button>
             </div>
             <pre className="code">
               {JSON.stringify(result, null, 2)}
