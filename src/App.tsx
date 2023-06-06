@@ -62,7 +62,7 @@ function App() {
     const magicAptosWallet = new MagicAptosWallet(magic, {
       connect: async () => {
         await magic.auth.loginWithMagicLink({ email });
-        const accountInfo = await magicAptosWallet.account();
+        const accountInfo = await magic.aptos.getAccountInfo();
         return accountInfo;
       }
     })
