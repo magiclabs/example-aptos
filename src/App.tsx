@@ -203,8 +203,10 @@ function App() {
           FAUCET_URL: {DEVNET_FAUCET_URL}
         </pre>
       </div>
-
+      
       <div className="card">
+      <h2>Welcome to example-aptos</h2>
+
         {isLoggedIn ? (
           <div style={{ width: '700px', overflow: 'hidden', textAlign: 'start' }}>
             <button onClick={logout}>Logout</button>
@@ -240,7 +242,7 @@ function App() {
           </div>
         ) : (
           <form className="container" onSubmit={login}>
-            <h3>Please sign up or login</h3>
+            <h2>Please sign up or login</h2>
             <div className="row">
               <input
                 type="email"
