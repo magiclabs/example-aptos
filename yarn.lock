@@ -515,9 +515,9 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@magic-ext/aptos@./packs/package_0.34.0.tgz":
-  version "0.34.0"
-  resolved "./packs/package_0.34.0.tgz#c88ebe01f2361072f441844b43704c1dab2c2d18"
+"@magic-ext/aptos@./packs/package_0.36.0.tgz":
+  version "0.36.0"
+  resolved "./packs/package_0.36.0.tgz#f6641bfe3de3930e84fab2fd4b39e4d3b4b3f246"
 
 "@magic-ext/auth@^0.2.4":
   version "0.2.5"
