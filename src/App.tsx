@@ -16,6 +16,7 @@ const DEVNET_FAUCET_URL = 'https://faucet.testnet.aptoslabs.com';
 
 const MAGIC_WALLET_ADDRESS = '0x906fd65afe31b7237cd4d7c4073d8bf76c61b6a24ec64dd26f0c16de5c2444d5'
 const SAMPLE_RAW_TRANSACTION = {
+  type: 'entry_function_payload',
   function: "0x1::coin::transfer",
   type_arguments: ["0x1::aptos_coin::AptosCoin"],
   arguments: [MAGIC_WALLET_ADDRESS, 1000]
@@ -38,14 +39,15 @@ function App() {
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [balance, setBalance] = useState(BigInt(0));
 
-  const [result, setResult] = useState<Uint8Array | string | null>(null)
+  const [result, setResult] = useState<any>(null)
 
   useEffect(() => {
     magic.user.isLoggedIn().then((async (magicIsLoggedIn: boolean) => {
       setIsLoggedIn(magicIsLoggedIn)
+
       if (magicIsLoggedIn) {
         const magicAptosWallet = new MagicAptosWallet(magic, {
-          // You don't need to set connect if you're already logged in
+          connect: async () => { return await magic.aptos.getAccountInfo() }
         });
         setAptosWallet(magicAptosWallet)
 
@@ -54,7 +56,7 @@ function App() {
         getBalance(accountInfo.address)
       }
     }))
-  }, [isLoggedIn])
+  }, [])
 
   const login = async (e: FormEvent) => {
     e.preventDefault();
