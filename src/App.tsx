@@ -103,6 +103,7 @@ function App() {
     });
 
     const accountInfo = await magicAptosWallet.connect();
+    getBalance(accountInfo.address);
     setAccountInfo(accountInfo);
     setAptosWallet(magicAptosWallet);
     setIsLoggedIn(true);
@@ -120,7 +121,7 @@ function App() {
     }
 
     const faucetClient = new FaucetClient(DEVNET_NODE_URL, DEVNET_FAUCET_URL);
-    await faucetClient.fundAccount(accountInfo.address, 100_000_000);
+    await faucetClient.fundAccount(accountInfo.address, 10_000);
 
     await getBalance(accountInfo.address);
   };
@@ -134,6 +135,8 @@ function App() {
   };
 
   const handleSignTransaction = async () => {
+    setResult(null);
+
     if (!accountInfo || !aptosWallet) {
       console.warn("No account");
       return;
@@ -144,18 +147,27 @@ function App() {
   };
 
   const handleSignAndSubmitTransaction = async () => {
+    setResult(null);
+
     if (!accountInfo || !aptosWallet) {
       console.warn("No account");
       return;
     }
 
-    const result = await aptosWallet.signAndSubmitTransaction(
+    const { hash } = await aptosWallet.signAndSubmitTransaction(
       SAMPLE_RAW_TRANSACTION
     );
-    setResult(result);
+
+    const client = new AptosClient(DEVNET_NODE_URL);
+    await client.waitForTransaction(hash, {
+      checkSuccess: true,
+    });
+    setResult(hash);
   };
 
   const handleSignAndSubmitBCSTransaction = async () => {
+    setResultB(null);
+
     if (!accountInfo || !aptosWallet) {
       console.warn("No account");
       return;
@@ -179,11 +191,18 @@ function App() {
       )
     );
 
-    const result = await aptosWallet.signAndSubmitBCSTransaction(payload);
-    setResultB(result);
+    const { hash } = await aptosWallet.signAndSubmitBCSTransaction(payload);
+
+    const client = new AptosClient(DEVNET_NODE_URL);
+    await client.waitForTransaction(hash, {
+      checkSuccess: true,
+    });
+    setResultB(hash);
   };
 
   const handleSignMessage = async () => {
+    setResultC(null);
+
     if (!accountInfo || !aptosWallet) {
       console.warn("No account");
       return;
@@ -194,6 +213,8 @@ function App() {
   };
 
   const handleSignMessageAndVerify = async () => {
+    setResultC(null);
+
     if (!accountInfo || !aptosWallet) {
       console.warn("No account");
       return;
@@ -208,10 +229,10 @@ function App() {
   return (
     <>
       <div>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
+        <a href="https://magic.link" target="_blank" rel="noreferrer">
           <img src={magicLogo} className="logo magic" alt="Magic logo" />
         </a>
-        <a href="https://react.dev" target="_blank" rel="noreferrer">
+        <a href="https://aptoslabs.com/" target="_blank" rel="noreferrer">
           <img src={aptosLogo} className="logo aptos" alt="Aptos logo" />
         </a>
         <a href="https://react.dev" target="_blank" rel="noreferrer">
@@ -232,25 +253,20 @@ function App() {
             <pre className="code">{JSON.stringify(networkInfo, null, 2)}</pre>
 
             <h2>Account Info</h2>
-            <pre className="code">{JSON.stringify(accountInfo, null, 2)}</pre>
+            <pre className="code" data-testid="account-info-box">
+              {JSON.stringify(accountInfo, null, 2)}
+            </pre>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
+            <h3>Balance</h3>
+            <pre className="code" data-testid="balance-box">
+              {balance?.toString() ?? "0"}
+            </pre>
+            <button
+              style={{ width: "100%" }}
+              onClick={faucetFiveCoins}
+              data-testid="faucet-button"
             >
-              <h3>Balance: {balance?.toString() ?? "0"} coins</h3>
-              {accountInfo && (
-                <button onClick={() => getBalance(accountInfo?.address)}>
-                  Get Balance
-                </button>
-              )}
-            </div>
-            <button style={{ width: "100%" }} onClick={faucetFiveCoins}>
-              💵💵💵 Get 100,000,000 coins from the Faucet 💵💵💵
+              💵💵💵 Get 10,000 coins from the Faucet 💵💵💵
             </button>
 
             <div className="divider" />
@@ -270,7 +286,9 @@ function App() {
               <button onClick={handleSignAndSubmitTransaction}>
                 signAndSubmitTransaction
               </button>
-              <pre className="code">{JSON.stringify(result, null, 2)}</pre>
+              <pre className="code" data-testid="transaction-result-box">
+                {JSON.stringify(result, null, 2)}
+              </pre>
             </div>
 
             <p>BCSTransaction paylod</p>
@@ -281,7 +299,9 @@ function App() {
               <button onClick={handleSignAndSubmitBCSTransaction}>
                 signAndSubmitBCSTransaction
               </button>
-              <pre className="code">{JSON.stringify(resultB, null, 2)}</pre>
+              <pre className="code" data-testid="bcs-transaction-result-box">
+                {JSON.stringify(resultB, null, 2)}
+              </pre>
             </div>
 
             <p>Message paylod</p>
@@ -293,7 +313,9 @@ function App() {
               <button onClick={handleSignMessageAndVerify}>
                 signMessageAndVerify
               </button>
-              <pre className="code">{JSON.stringify(resultC, null, 2)}</pre>
+              <pre className="code" data-testid="message-result-box">
+                {JSON.stringify(resultC, null, 2)}
+              </pre>
             </div>
           </div>
         ) : (
