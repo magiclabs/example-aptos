@@ -1,6 +1,6 @@
 # example-aptos
 
-[![Edit on Codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/sandbox/github/MagicLabs/example-aptos/tree/main)
+[![Edit on Codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/magiclabs/example-aptos/main)
 
 An example app showing how to use Magic SDK + Aptos Extension
 
