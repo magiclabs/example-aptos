@@ -6,7 +6,7 @@ export let page: Page;
 test.beforeAll(async ({ browser }) => {
   page = await browser.newPage();
 
-  page.goto("/");
+  page.goto("http://localhost:5173");
 });
 
 test.afterAll(async () => {
