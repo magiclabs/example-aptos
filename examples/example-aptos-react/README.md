@@ -1,7 +1,5 @@
 # example-aptos-react
 
-[![Edit on Codesandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/github/magiclabs/example-aptos/main)
-
 An example app showing how to use Magic SDK + Aptos Extension
 
 **System Requirements:**
