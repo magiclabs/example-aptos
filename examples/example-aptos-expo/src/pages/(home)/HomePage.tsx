@@ -91,7 +91,6 @@ export const HomePage = () => {
       SAMPLE_MESSAGE_PAYLOAD
     );
 
-    console.log(result);
     setResultC(result);
   };
 
