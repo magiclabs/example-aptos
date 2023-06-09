@@ -24,12 +24,12 @@ export const HomeLayout = () => {
           setAptosWallet(magicAptosWallet);
           setIsChecked(true);
         } else {
-          router.replace("/signin");
+          router.replace("/sign-in");
         }
       })
       .catch((e) => {
         console.warn(e);
-        router.replace("/signin");
+        router.replace("/sign-in");
       });
   }, []);
 

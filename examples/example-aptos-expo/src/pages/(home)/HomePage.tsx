@@ -8,13 +8,14 @@ import { getBalance } from "@/lib/aptos/getBalance";
 import { useAptosWallet, useSetAptosWallet } from "@/states/aptosWalletStore";
 import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-core";
 import { AptosClient, BCS, HexString, TxnBuilderTypes } from "aptos";
+import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { View, Text, StyleSheet, Button, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const HomePage = () => {
+  const router = useRouter();
   const aptosWallet = useAptosWallet();
-  const setAptosWallet = useSetAptosWallet();
 
   const [network, setNetwork] = useState<NetworkInfo | null>(null);
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
@@ -94,6 +95,11 @@ export const HomePage = () => {
     setResultC(result);
   };
 
+  const handleDisconnect = async () => {
+    await aptosWallet.disconnect();
+    router.replace("/sign-in");
+  };
+
   useEffect(() => {
     aptosWallet.network().then(setNetwork);
     aptosWallet.account().then(async (accountInfo) => {
@@ -107,6 +113,8 @@ export const HomePage = () => {
       <ScrollView>
         <View style={styles.container}>
           <Text style={styles.title}>Magic + Aptos + React Native</Text>
+
+          <Button title="Disconnect" onPress={handleDisconnect} />
 
           <View>
             <Text style={styles.subtitle}>Network</Text>
