@@ -1,13 +1,28 @@
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { magic } from "@/lib/magic";
 import { useState } from "react";
+import { MagicAptosWallet } from "@magic-ext/aptos";
+import { useSetAptosWallet } from "@/states/aptosWalletStore";
+import { useRouter } from "expo-router";
 
 export const SignInPage = () => {
+  const router = useRouter();
+  const setAptosWallet = useSetAptosWallet();
   const [email, setEmail] = useState("");
 
   const loginWithMagicLink = async () => {
-    await magic.auth.loginWithMagicLink({ email });
-    const userMetadata = await magic.user.getMetadata();
+    const magicAptosWallet = new MagicAptosWallet(magic, {
+      connect: async () => {
+        await magic.auth.loginWithMagicLink({ email });
+        const accountInfo = await magic.aptos.getAccountInfo();
+        return accountInfo;
+      },
+    });
+
+    await magicAptosWallet.connect();
+    setAptosWallet(magicAptosWallet);
+
+    router.replace("/");
   };
 
   return (
