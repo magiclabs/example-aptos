@@ -1746,10 +1746,10 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@magic-ext/aptos@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@magic-ext/aptos/-/aptos-0.5.0.tgz#d77ff0313c093bc6268aad0c58621cbc063d47fc"
-  integrity sha512-p6AHWkbapxpaUbIavn0++HNWerafb1z/VtDEQVns8BYd7v8K+uvE1aRORSYCByEvgsXb03vXScqlH70ey1nkpg==
+"@magic-ext/aptos@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@magic-ext/aptos/-/aptos-0.6.0.tgz#20cb8e77117dd6bfb932a97a4b1d44adbf96da88"
+  integrity sha512-RVSrg+St6pVToA9I//jg6KSJ2XcPq8/rgM0L7Ul9YkxzI6tQ9YmDLhvp7ODuz19rjVZ9nYXft46CsrhFwBQOUg==
 
 "@magic-sdk/commons@^13.3.0":
   version "13.3.0"
@@ -6739,6 +6739,11 @@ react-native-gradle-plugin@^0.71.15:
   resolved "https://registry.yarnpkg.com/react-native-gradle-plugin/-/react-native-gradle-plugin-0.71.19.tgz#3379e28341fcd189bc1f4691cefc84c1a4d7d232"
   integrity sha512-1dVk9NwhoyKHCSxcrM6vY6cxmojeATsBobDicX0ZKr7DgUF2cBQRTKsimQFvzH8XhOVXyH8p4HyDSZNIFI8OlQ==
 
+react-native-polyfill-globals@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-polyfill-globals/-/react-native-polyfill-globals-3.1.0.tgz#da7f6c695cd2360096b9a233c4e711d91f1542f8"
+  integrity sha512-6ACmV1SjXvZP2LN6J2yK58yNACKddcvoiKLrSQdISx32IdYStfdmGXrbAfpd+TANrTlIaZ2SLoFXohNwhnqm/w==
+
 react-native-safe-area-context@^4.5.3:
   version "4.5.3"
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-4.5.3.tgz#e98eb1a73a6b3846d296545fe74760754dbaaa69"
@@ -7697,6 +7702,11 @@ terser@^5.15.0:
     acorn "^8.8.2"
     commander "^2.20.0"
     source-map-support "~0.5.20"
+
+text-encoding@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/text-encoding/-/text-encoding-0.7.0.tgz#f895e836e45990624086601798ea98e8f36ee643"
+  integrity sha512-oJQ3f1hrOnbRLOcwKz0Liq2IcrvDeZRHXhd9RgLrsT+DjWY/nty1Hi7v3dtkaEYbPYe0mUoOfzRrMwfXXwgPUA==
 
 text-table@^0.2.0:
   version "0.2.0"
