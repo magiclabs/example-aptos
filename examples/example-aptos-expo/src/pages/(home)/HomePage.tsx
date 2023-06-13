@@ -5,7 +5,7 @@ import {
   SAMPLE_TRANSACTION_PAYLOAD,
 } from "@/constants";
 import { getBalance } from "@/lib/aptos/getBalance";
-import { useAptosWallet, useSetAptosWallet } from "@/states/aptosWalletStore";
+import { useAptosWallet } from "@/states/aptosWalletStore";
 import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-core";
 import { AptosClient, BCS, HexString, TxnBuilderTypes } from "aptos";
 import { useRouter } from "expo-router";
@@ -30,7 +30,11 @@ export const HomePage = () => {
       TxnBuilderTypes.EntryFunction.natural(
         "0x1::coin",
         "transfer",
-        [TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")],
+        [
+          new TxnBuilderTypes.TypeTagStruct(
+            TxnBuilderTypes.StructTag.fromString("0x1::aptos_coin::AptosCoin")
+          ),
+        ],
         [
           BCS.bcsToBytes(
             TxnBuilderTypes.AccountAddress.fromHex(MAGIC_WALLET_ADDRESS)
