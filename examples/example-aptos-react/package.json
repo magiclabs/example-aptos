@@ -12,7 +12,7 @@
   "dependencies": {
     "@aptos-labs/wallet-adapter-core": "^2.2.0",
     "@magic-ext/aptos": "1.2.1",
-    "@magic-ext/auth": "^0.2.4",
+    "@magic-ext/auth": "1.2.1",
     "aptos": "^1.9.0",
     "magic-sdk": "18.2.1",
     "react": "^18.2.0",

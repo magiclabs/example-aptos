@@ -525,10 +525,10 @@
   resolved "https://registry.yarnpkg.com/@magic-ext/aptos/-/aptos-1.2.1.tgz#139129b465e9864188a4fff58d5ac6eab99e9f90"
   integrity sha512-gP687Qt59KV/wOI4TiCOae4sLoAMX76HiQ5tss6VbJXPQu6qBgyl+Gm3ipCYjUn8zF7f7UzXozsTHOuLz2Rfqg==
 
-"@magic-ext/auth@^0.2.4":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@magic-ext/auth/-/auth-0.2.5.tgz#72be804bfeb2471e48cb45038f4f46bcb001a4df"
-  integrity sha512-cyZDjP8KhYRPWibtjxx+yqVNrayZ27ZK2qysXp3qXUiw1Fz9IvUX+OPzpqGXi0GGKz5iCljpSqAmuWEKD3k7jw==
+"@magic-ext/auth@1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@magic-ext/auth/-/auth-1.2.1.tgz#c754746aca840f1ba9a25a6df80c594b941303f0"
+  integrity sha512-kFFOTuNLvb5OyuivfxROQBvbleOsGRiv6aC2Gc+R8Xj0I+sMmymlXHsKRY9aOU/aa5zunh76tIJGYavT/WIkxw==
 
 "@magic-sdk/commons@^14.2.1":
   version "14.2.1"
