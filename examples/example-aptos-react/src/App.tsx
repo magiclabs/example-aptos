@@ -81,6 +81,7 @@ function App() {
         setAptosWallet(magicAptosWallet);
 
         const accountInfo = await magicAptosWallet.account();
+        console.log(accountInfo);
         setAccountInfo(accountInfo);
 
         const networkInfo = await magicAptosWallet.network();
@@ -103,6 +104,7 @@ function App() {
     });
 
     const accountInfo = await magicAptosWallet.connect();
+    console.log({ accountInfo });
     getBalance(accountInfo.address);
     setAccountInfo(accountInfo);
     setAptosWallet(magicAptosWallet);
