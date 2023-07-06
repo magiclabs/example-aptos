@@ -1,7 +1,6 @@
 import { useState, useEffect, FormEvent } from "react";
 import { Magic } from "magic-sdk";
 import { AptosExtension, MagicAptosWallet } from "@magic-ext/aptos";
-import { AuthExtension } from "@magic-ext/auth";
 import {
   AptosClient,
   BCS,
@@ -48,7 +47,6 @@ const SAMPLE_MESSAGE_PAYLOAD = {
 
 const magic = new Magic(import.meta.env.VITE_MAGIC_API_KEY, {
   extensions: [
-    new AuthExtension(),
     new AptosExtension({
       nodeUrl: DEVNET_NODE_URL,
     }),
