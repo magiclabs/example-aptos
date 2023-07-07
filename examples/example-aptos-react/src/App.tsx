@@ -14,6 +14,7 @@ import reactLogo from "./assets/react.svg";
 import aptosLogo from "./assets/aptos.svg";
 import "./App.css";
 import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-core";
+import { parseOctasToApt } from "./utils/parseOctasToApt";
 
 const DEVNET_NODE_URL = "https://fullnode.testnet.aptoslabs.com";
 const DEVNET_FAUCET_URL = "https://faucet.testnet.aptoslabs.com";
@@ -121,7 +122,7 @@ function App() {
     }
 
     const faucetClient = new FaucetClient(DEVNET_NODE_URL, DEVNET_FAUCET_URL);
-    await faucetClient.fundAccount(accountInfo.address, 10_000);
+    await faucetClient.fundAccount(accountInfo.address, 100_000_000);
 
     await getBalance(accountInfo.address);
   };
@@ -259,14 +260,15 @@ function App() {
 
             <h3>Balance</h3>
             <pre className="code" data-testid="balance-box">
-              {balance?.toString() ?? "0"}
+              {balance?.toString() ? parseOctasToApt(balance.toString()) : "0"}{" "}
+              APT
             </pre>
             <button
               style={{ width: "100%" }}
               onClick={faucetFiveCoins}
               data-testid="faucet-button"
             >
-              💵💵💵 Get 10,000 coins from the Faucet 💵💵💵
+              💵💵💵 Get 1 APT from the Faucet 💵💵💵
             </button>
 
             <div className="divider" />
