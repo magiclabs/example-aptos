@@ -1,5 +1,7 @@
 # example-aptos-react
 
+> https://example-aptos-joew.vercel.app/
+
 An example app showing how to use Magic SDK + Aptos Extension
 
 **System Requirements:**
